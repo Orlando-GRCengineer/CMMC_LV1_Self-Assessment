@@ -1,0 +1,2236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CMMC Level 1 Self-Assessment Tool | Orlando-GRCengineer</title>
+
+<!-- SEO Meta -->
+<meta name="description" content="A free, browser-based CMMC Level 1 self-assessment tool covering all 17 practices across 6 domains. Built for DoD contractors, GRC engineers, and cybersecurity professionals.">
+<meta name="keywords" content="CMMC, CMMC Level 1, self-assessment, GRC, cybersecurity, NIST SP 800-171, FAR 52.204-21, DoD contractor, FCI, compliance">
+<meta name="author" content="Orlando-GRCengineer">
+<meta name="robots" content="index, follow">
+
+<!-- Canonical -->
+<link rel="canonical" href="https://orlando-grcengineer.github.io/cmmc-l1-assessment/">
+
+<!-- Open Graph (LinkedIn, Slack, etc.) -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="CMMC Level 1 Self-Assessment Tool">
+<meta property="og:description" content="Free browser-based CMMC Level 1 self-assessment covering all 17 practices. Live scoring, guidance panels, evidence attachments, and exportable reports.">
+<meta property="og:url" content="https://orlando-grcengineer.github.io/cmmc-l1-assessment/">
+<meta property="og:site_name" content="CMMC L1 Assessment | Orlando-GRCengineer">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="CMMC Level 1 Self-Assessment Tool">
+<meta name="twitter:description" content="Free browser-based CMMC Level 1 self-assessment covering all 17 practices. Live scoring, guidance panels, evidence attachments, and exportable reports.">
+
+<!-- Favicon (inline SVG shield) -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='12' fill='%230066ff'/><text y='68' x='50' text-anchor='middle' font-size='52' font-family='monospace' font-weight='bold' fill='white'>C</text></svg>">
+
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1b3e;
+    --surface: #132048;
+    --surface2: #1a2a5a;
+    --border: #2a4070;
+    --accent: #0066ff;
+    --accent2: #00d4ff;
+    --green: #00e676;
+    --red: #ff3d57;
+    --yellow: #ffd600;
+    --text: #e8eaf6;
+    --text-dim: #7986a8;
+    --text-dimmer: #4a5578;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+    /* Global font scale — increase this to make everything bigger */
+    font-size: 17px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(0,102,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,102,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  /* Header */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 20px 0;
+    position: sticky;
+    top: 0;
+    background: rgba(13,27,62,0.95);
+    backdrop-filter: blur(12px);
+    z-index: 100;
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-badge {
+    background: var(--accent);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    letter-spacing: 0.08em;
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 50%, calc(100% - 8px) 100%, 0 100%);
+    padding-right: 22px;
+  }
+
+  .logo-text {
+    font-family: var(--mono);
+    font-size: 1.05rem;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  .logo-text span { color: var(--accent2); }
+
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+
+  .btn {
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 8px 16px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .btn:hover { border-color: var(--accent); color: var(--accent2); }
+
+  .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  .btn-primary:hover { background: #0052cc; border-color: #0052cc; color: #fff; }
+
+  /* Hero / Score Dashboard */
+  .dashboard {
+    padding: 40px 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+
+  .dashboard-title {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--text-dimmer);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .score-grid {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 32px;
+    align-items: center;
+  }
+
+  .score-ring-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .score-ring {
+    position: relative;
+    width: 180px;
+    height: 180px;
+  }
+
+  .score-ring svg { transform: rotate(-90deg); }
+
+  .score-ring-bg { fill: none; stroke: var(--surface2); stroke-width: 8; }
+  .score-ring-fill { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.6s ease; }
+
+  .score-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .score-pct {
+    font-family: var(--mono);
+    font-size: 2.6rem;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  .score-label {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text-dimmer);
+    letter-spacing: 0.12em;
+    margin-top: 4px;
+  }
+
+  .score-status {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    padding: 4px 12px;
+    border-radius: 2px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 16px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+  }
+
+  .stat-card.green::before { background: var(--green); }
+  .stat-card.red::before { background: var(--red); }
+  .stat-card.yellow::before { background: var(--yellow); }
+
+  .stat-val {
+    font-family: var(--mono);
+    font-size: 2rem;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .stat-card.green .stat-val { color: var(--green); }
+  .stat-card.red .stat-val { color: var(--red); }
+  .stat-card.yellow .stat-val { color: var(--yellow); }
+
+  .stat-label {
+    font-size: 0.9rem;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: var(--mono);
+  }
+
+  /* Domain bars */
+  .domain-bars { display: flex; flex-direction: column; gap: 10px; }
+
+  .domain-bar-row {
+    display: grid;
+    grid-template-columns: 200px 1fr 60px;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .domain-bar-label {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .domain-bar-track {
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 0;
+    overflow: hidden;
+  }
+
+  .domain-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.5s ease;
+    position: relative;
+  }
+
+  .domain-bar-pct {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    text-align: right;
+  }
+
+  /* Controls */
+  .controls-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .controls-title {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--text-dimmer);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .filter-row { display: flex; gap: 8px; }
+
+  .filter-btn {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    padding: 5px 12px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dimmer);
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: all 0.15s;
+  }
+
+  .filter-btn.active { border-color: var(--accent); color: var(--accent2); background: rgba(0,102,255,0.08); }
+
+  /* Domain section */
+  .domain-section { margin-bottom: 8px; }
+
+  .domain-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    user-select: none;
+    transition: border-color 0.2s;
+  }
+
+  .domain-header:hover { border-color: rgba(0,102,255,0.4); }
+
+  .domain-code {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--accent2);
+    letter-spacing: 0.1em;
+    background: rgba(0,212,255,0.08);
+    padding: 3px 8px;
+    border: 1px solid rgba(0,212,255,0.2);
+    white-space: nowrap;
+  }
+
+  .domain-name {
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 500;
+    flex: 1;
+  }
+
+  .domain-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+  }
+
+  .domain-pill {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    padding: 3px 10px;
+  }
+
+  .domain-chevron {
+    color: var(--text-dimmer);
+    font-size: 0.9rem;
+    transition: transform 0.2s;
+  }
+
+  .domain-section.open .domain-chevron { transform: rotate(90deg); }
+
+  .domain-body {
+    display: none;
+    border: 1px solid var(--border);
+    border-top: none;
+  }
+
+  .domain-section.open .domain-body { display: block; }
+
+  /* Practice item */
+  .practice {
+    padding: 20px 20px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  .practice:last-child { border-bottom: none; }
+  .practice:hover { background: rgba(255,255,255,0.01); }
+
+  .practice-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 12px;
+  }
+
+  .practice-id {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    margin-top: 2px;
+    min-width: 80px;
+  }
+
+  .practice-text {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .practice-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .response-btns { display: flex; gap: 6px; }
+
+  .resp-btn {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dimmer);
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: all 0.15s;
+  }
+
+  .resp-btn.yes:hover { border-color: var(--green); color: var(--green); }
+  .resp-btn.no:hover  { border-color: var(--red);   color: var(--red);   }
+  .resp-btn.na:hover  { border-color: var(--yellow); color: var(--yellow); }
+
+  .resp-btn.yes.active { border-color: var(--green);  background: var(--green);  color: #002a14; font-weight: 600; }
+  .resp-btn.no.active  { border-color: var(--red);    background: var(--red);    color: #fff;    font-weight: 600; }
+  .resp-btn.na.active  { border-color: var(--yellow); background: var(--yellow); color: #2a2000; font-weight: 600; }
+
+  .evidence-wrap { flex: 1; position: relative; }
+
+  /* Evidence expandable panel */
+  .evidence-section { margin-top: 12px; }
+
+  .evidence-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    padding: 8px 14px;
+    cursor: pointer;
+    text-align: left;
+    letter-spacing: 0.05em;
+    transition: all 0.15s;
+    user-select: none;
+  }
+
+  .evidence-toggle:hover { border-color: var(--accent); color: var(--text); }
+  .evidence-toggle.open { border-color: var(--accent); color: var(--accent2); border-bottom: none; }
+
+  .evidence-toggle .ev-arrow { transition: transform 0.2s; display: inline-block; font-size: 0.72rem; }
+  .evidence-toggle.open .ev-arrow { transform: rotate(90deg); }
+
+  .evidence-toggle .ev-label { flex: 1; }
+  .evidence-toggle .ev-count {
+    font-size: 0.72rem;
+    color: var(--accent2);
+    background: rgba(0,102,255,0.15);
+    padding: 2px 8px;
+    border: 1px solid rgba(0,102,255,0.3);
+  }
+
+  .evidence-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s ease;
+  }
+
+  .evidence-panel.open { grid-template-rows: 1fr; }
+
+  .evidence-panel-inner { overflow: hidden; }
+
+  .evidence-body {
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    border-top: none;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .evidence-input {
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    color: #1a1a2e;
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.15s;
+    resize: vertical;
+    min-height: 100px;
+    line-height: 1.6;
+  }
+
+  .evidence-input:focus { border-color: var(--accent); }
+  .evidence-input::placeholder { color: #9aa0b4; }
+
+  .evidence-file-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .evidence-file-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    padding: 6px 14px;
+    border: 1px dashed var(--border);
+    background: transparent;
+    color: var(--text-dimmer);
+    cursor: pointer;
+    letter-spacing: 0.06em;
+    transition: all 0.15s;
+    text-transform: uppercase;
+  }
+
+  .evidence-file-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  .evidence-file-input { display: none; }
+
+  .evidence-attachments {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .attachment-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0,102,255,0.08);
+    border: 1px solid rgba(0,102,255,0.2);
+    padding: 4px 10px 4px 6px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    max-width: 200px;
+    position: relative;
+  }
+
+  .attachment-thumb {
+    width: 32px;
+    height: 32px;
+    object-fit: cover;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .attachment-icon {
+    width: 32px;
+    height: 32px;
+    background: rgba(0,102,255,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .attachment-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100px;
+  }
+
+  .attachment-remove {
+    background: none;
+    border: none;
+    color: var(--text-dimmer);
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0 0 0 4px;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: color 0.15s;
+  }
+
+  .attachment-remove:hover { color: var(--red); }
+
+  /* Lightbox / file preview modal */
+  .lightbox-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    backdrop-filter: blur(8px);
+    z-index: 3000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+  }
+
+  .lightbox-overlay.open { display: flex; }
+
+  .lightbox-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 900px;
+  }
+
+  .lightbox-filename {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 70%;
+  }
+
+  .lightbox-actions { display: flex; gap: 10px; align-items: center; }
+
+  .lightbox-close {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 6px 12px;
+    font-family: var(--mono);
+    transition: all 0.15s;
+  }
+
+  .lightbox-close:hover { border-color: var(--red); color: var(--red); }
+
+  .lightbox-download {
+    background: var(--accent);
+    border: 1px solid var(--accent);
+    color: #fff;
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 6px 14px;
+    font-family: var(--mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    transition: all 0.15s;
+  }
+
+  .lightbox-download:hover { background: #0052cc; }
+
+  .lightbox-content {
+    width: 100%;
+    max-width: 900px;
+    max-height: calc(100vh - 120px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+  }
+
+  .lightbox-content img {
+    max-width: 100%;
+    max-height: calc(100vh - 140px);
+    object-fit: contain;
+    border: 1px solid var(--border);
+  }
+
+  .lightbox-content iframe {
+    width: 100%;
+    height: calc(100vh - 140px);
+    border: 1px solid var(--border);
+    background: #fff;
+  }
+
+  .lightbox-content .lightbox-text {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    padding: 20px;
+    width: 100%;
+    max-height: calc(100vh - 140px);
+    overflow: auto;
+    white-space: pre-wrap;
+    line-height: 1.7;
+  }
+
+  .lightbox-content .lightbox-unsupported {
+    text-align: center;
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 1rem;
+    padding: 40px;
+  }
+
+  .lightbox-content .lightbox-unsupported .lb-icon { font-size: 4rem; margin-bottom: 16px; }
+  .lightbox-content .lightbox-unsupported p { color: var(--text-dimmer); font-size: 0.82rem; margin-top: 8px; }
+
+  /* Make attachment items clickable */
+  .attachment-item { cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+  .attachment-item:hover { border-color: var(--accent2); background: rgba(0,212,255,0.08); }
+
+  /* Progress indicator on practice */
+  .practice-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-dimmer);
+    margin-top: 4px;
+    flex-shrink: 0;
+  }
+
+  .practice.answered-yes .practice-status-dot { background: var(--green); }
+  .practice.answered-no .practice-status-dot { background: var(--red); }
+  .practice.answered-na .practice-status-dot { background: var(--yellow); }
+
+  /* Guidance panel */
+  .guidance-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: none;
+    border: 1px solid rgba(0,102,255,0.25);
+    padding: 3px 10px;
+    transition: all 0.15s;
+    white-space: nowrap;
+    user-select: none;
+  }
+
+  .guidance-toggle:hover { border-color: var(--accent); background: rgba(0,102,255,0.08); color: var(--accent2); }
+  .guidance-toggle.open { background: rgba(0,102,255,0.12); border-color: var(--accent); color: var(--accent2); }
+
+  .guidance-toggle .gt-arrow { transition: transform 0.2s; display: inline-block; }
+  .guidance-toggle.open .gt-arrow { transform: rotate(90deg); }
+
+  .guidance-panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s ease;
+    margin-top: 0;
+  }
+
+  .guidance-panel.open {
+    grid-template-rows: 1fr;
+    margin-top: 12px;
+  }
+
+  .guidance-inner {
+    overflow: hidden;
+  }
+
+  .guidance-body {
+    background: rgba(0,102,255,0.04);
+    border: 1px solid rgba(0,102,255,0.2);
+    border-left: 3px solid var(--accent);
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .guidance-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 12px;
+    align-items: baseline;
+  }
+
+  .guidance-label {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--accent2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .guidance-val {
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    line-height: 1.7;
+  }
+
+  .guidance-val.mono {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+  }
+
+  .guidance-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .guidance-tag {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    padding: 2px 8px;
+    border: 1px solid rgba(0,212,255,0.2);
+    color: var(--text-dimmer);
+    background: rgba(0,212,255,0.04);
+    letter-spacing: 0.06em;
+  }
+
+  .guidance-divider {
+    border: none;
+    border-top: 1px solid rgba(0,102,255,0.12);
+    margin: 0;
+  }
+
+  /* Assessor Info Box */
+  .assessor-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent2);
+    padding: 20px 24px;
+    margin-bottom: 28px;
+  }
+
+  .assessor-box-title {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-dimmer);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .assessor-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  .assessor-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .assessor-label {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--accent2);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .assessor-input {
+    background: #ffffff;
+    border: 1px solid var(--border);
+    color: #1a1a2e;
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    padding: 9px 14px;
+    outline: none;
+    transition: border-color 0.15s;
+    width: 100%;
+  }
+
+  .assessor-input:focus { border-color: var(--accent2); }
+  .assessor-input::placeholder { color: #9aa0b4; }
+
+  /* Export modal */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    width: 680px;
+    max-width: 95vw;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--surface);
+  }
+
+  .modal-title {
+    font-family: var(--mono);
+    font-size: 1rem;
+    color: var(--accent2);
+    letter-spacing: 0.06em;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--text-dimmer);
+    cursor: pointer;
+    font-size: 1.2rem;
+    line-height: 1;
+    padding: 4px;
+  }
+
+  .modal-close:hover { color: var(--text); }
+
+  .modal-body { padding: 24px; }
+
+  #report-output {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    line-height: 1.7;
+    padding: 20px;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 16px;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--surface2);
+    border: 1px solid var(--green);
+    color: var(--green);
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    padding: 12px 20px;
+    z-index: 2000;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s;
+    letter-spacing: 0.06em;
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+
+  /* Footer */
+  footer {
+    margin-top: 60px;
+    border-top: 1px solid var(--border);
+    padding: 32px 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .footer-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .footer-logo .logo-badge {
+    font-size: 0.72rem;
+    padding: 3px 8px;
+    padding-right: 16px;
+  }
+
+  .footer-logo-text {
+    font-family: var(--mono);
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  .footer-tagline {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text-dimmer);
+    letter-spacing: 0.08em;
+    margin-left: 2px;
+  }
+
+  .footer-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+
+  .footer-copyright {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  .footer-copyright span {
+    color: var(--accent2);
+  }
+
+  .footer-version {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text-dimmer);
+    letter-spacing: 0.08em;
+  }
+
+  .footer-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    opacity: 0.5;
+  }
+
+  .footer-disclaimer {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text-dimmer);
+    line-height: 1.8;
+    letter-spacing: 0.03em;
+    max-width: 900px;
+  }
+
+  .footer-disclaimer strong {
+    color: var(--yellow);
+    font-weight: 500;
+  }
+
+  .footer-refs {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 4px;
+  }
+
+  .footer-ref {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--text-dimmer);
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .footer-ref:hover { color: var(--accent2); border-color: var(--accent2); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .score-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .domain-bar-row { grid-template-columns: 1fr 1fr 40px; }
+    .domain-bar-label { display: none; }
+    .footer-top { flex-direction: column; }
+    .footer-meta { align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-badge">CMMC</div>
+        <div class="logo-text">LEVEL 1 // <span>SELF-ASSESSMENT</span></div>
+      </div>
+      <div class="header-actions">
+        <button class="btn" onclick="resetAll()">Reset</button>
+        <button class="btn" onclick="saveProgress()">Save</button>
+        <button class="btn btn-primary" onclick="openReport()">Export Report</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Dashboard -->
+  <div class="dashboard">
+    <div class="dashboard-title">// Assessment Dashboard</div>
+    <div class="score-grid">
+      <div class="score-ring-wrap">
+        <div class="score-ring">
+          <svg width="180" height="180" viewBox="0 0 180 180">
+            <circle class="score-ring-bg" cx="90" cy="90" r="78"/>
+            <circle class="score-ring-fill" id="ring-fill" cx="90" cy="90" r="78"
+              stroke="#0066ff"
+              stroke-dasharray="490"
+              stroke-dashoffset="490"/>
+          </svg>
+          <div class="score-center">
+            <div class="score-pct" id="score-pct" style="color: var(--text-dim)">0%</div>
+            <div class="score-label">COMPLIANT</div>
+          </div>
+        </div>
+        <div class="score-status" id="score-status" style="background: rgba(255,255,255,0.05); color: var(--text-dimmer)">NOT STARTED</div>
+      </div>
+
+      <div>
+        <div class="stats-grid">
+          <div class="stat-card green">
+            <div class="stat-val" id="stat-yes">0</div>
+            <div class="stat-label">Compliant</div>
+          </div>
+          <div class="stat-card red">
+            <div class="stat-val" id="stat-no">0</div>
+            <div class="stat-label">Non-Compliant</div>
+          </div>
+          <div class="stat-card yellow">
+            <div class="stat-val" id="stat-na">0</div>
+            <div class="stat-label">Not Applicable</div>
+          </div>
+        </div>
+        <div class="domain-bars" id="domain-bars"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Assessor Info -->
+  <div class="assessor-box">
+    <div class="assessor-box-title">// Assessor Information</div>
+    <div class="assessor-fields">
+      <div class="assessor-field">
+        <label class="assessor-label">Assessor Name</label>
+        <input class="assessor-input" id="assessor-name" type="text" placeholder="Full name of person conducting assessment" oninput="saveAssessorInfo()">
+      </div>
+      <div class="assessor-field">
+        <label class="assessor-label">Title / Role</label>
+        <input class="assessor-input" id="assessor-title" type="text" placeholder="e.g. GRC Engineer, IT Manager" oninput="saveAssessorInfo()">
+      </div>
+      <div class="assessor-field">
+        <label class="assessor-label">Organization</label>
+        <input class="assessor-input" id="assessor-org" type="text" placeholder="Company or organization name" oninput="saveAssessorInfo()">
+      </div>
+      <div class="assessor-field">
+        <label class="assessor-label">Assessment Date</label>
+        <input class="assessor-input" id="assessor-date" type="date" oninput="saveAssessorInfo()">
+      </div>
+      <div class="assessor-field">
+        <label class="assessor-label">Review Date</label>
+        <input class="assessor-input" id="assessor-review" type="date" oninput="saveAssessorInfo()">
+      </div>
+      <div class="assessor-field">
+        <label class="assessor-label">Assessment Version</label>
+        <input class="assessor-input" id="assessor-version" type="text" placeholder="e.g. v1.0" oninput="saveAssessorInfo()">
+      </div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="controls-header">
+    <div class="controls-title">// 17 Practices · 6 Domains</div>
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+      <button class="filter-btn" onclick="setFilter('unanswered', this)">Unanswered</button>
+      <button class="filter-btn" onclick="setFilter('no', this)">Non-Compliant</button>
+    </div>
+  </div>
+
+  <div id="assessment"></div>
+
+</div>
+
+<!-- Report Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">// CMMC L1 Assessment Report</div>
+      <button class="modal-close" onclick="closeReport()">✕</button>
+    </div>
+    <div class="modal-body">
+      <pre id="report-output"></pre>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-primary" onclick="copyReport()">Copy Report</button>
+        <button class="btn" onclick="downloadReport()">Download .txt</button>
+        <button class="btn" onclick="closeReport()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Lightbox / File Preview -->
+<div class="lightbox-overlay" id="lightbox" onclick="closeLightbox(event)">
+  <div class="lightbox-header">
+    <div class="lightbox-filename" id="lb-filename"></div>
+    <div class="lightbox-actions">
+      <button class="lightbox-download" onclick="downloadAttachment()">⬇ Download</button>
+      <button class="lightbox-close" onclick="closeLightboxDirect()">✕ Close</button>
+    </div>
+  </div>
+  <div class="lightbox-content" id="lb-content"></div>
+</div>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="footer-logo">
+            <div class="logo-badge">CMMC</div>
+            <div class="footer-logo-text">LEVEL 1 // SELF-ASSESSMENT TOOL</div>
+          </div>
+          <div class="footer-tagline">// GRC TOOLING · CYBERSECURITY COMPLIANCE</div>
+        </div>
+        <div class="footer-meta">
+          <div class="footer-copyright">
+            &copy; <span id="footer-year"></span> <span>CMMC L1 Assessment Tool</span>. All rights reserved.
+          </div>
+          <div class="footer-version">Orlando-GRCengineer · VERSION 1.0.0 · BUILD 2025</div>
+        </div>
+      </div>
+
+      <hr class="footer-divider">
+
+      <div class="footer-disclaimer">
+        <strong>DISCLAIMER:</strong> This tool is provided for self-assessment and preparation purposes only. It does not constitute an official CMMC assessment and confers no certification status.
+        Official CMMC Level 1 certification requires an annual self-assessment submitted to the Supplier Performance Risk System (SPRS) by a Senior Official.
+        CMMC, FCI, and CUI requirements are governed by 32 CFR Part 170 and DFARS 252.204-7021.
+        All 17 practices are derived from <strong>FAR Clause 52.204-21</strong> and <strong>NIST SP 800-171 Rev 2</strong>.
+        This tool does not store or transmit your data externally — all responses are saved locally in your browser.
+        <div class="footer-refs">
+          <a class="footer-ref" href="https://dodcio.defense.gov/CMMC/" target="_blank" rel="noopener">DOD CMMC Program ↗</a>
+          <a class="footer-ref" href="https://csrc.nist.gov/publications/detail/sp/800-171/rev-2/final" target="_blank" rel="noopener">NIST SP 800-171 Rev 2 ↗</a>
+          <a class="footer-ref" href="https://www.acquisition.gov/far/52.204-21" target="_blank" rel="noopener">FAR 52.204-21 ↗</a>
+          <a class="footer-ref" href="https://www.sprs.csd.disa.mil/" target="_blank" rel="noopener">SPRS Portal ↗</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const DOMAINS = [
+  {
+    code: 'AC',
+    name: 'Access Control',
+    practices: [
+      {
+        id: 'AC.L1-3.1.1',
+        text: 'Limit information system access to authorized users, processes acting on behalf of authorized users, and devices (including other information systems).',
+        nistRef: 'NIST SP 800-171 Rev 2 § 3.1.1',
+        farRef: 'FAR 52.204-21 (b)(1)(i)',
+        objective: 'Ensure that only authorized users, processes, and devices can access your information systems. This is the foundation of access control — preventing unauthorized individuals or systems from gaining entry.',
+        keyActivities: [
+          'Maintain a list of authorized users with approved access',
+          'Implement user accounts and authentication for all system access',
+          'Restrict device connections to only approved/registered devices',
+          'Disable or remove default/guest accounts',
+          'Review and update authorized user lists regularly'
+        ],
+        assessmentMethods: 'Examine access control policies; review user account lists; test login controls; verify device authentication requirements.',
+        nistMapping: 'AC-2, AC-3, AC-17'
+      },
+      {
+        id: 'AC.L1-3.1.2',
+        text: 'Limit information system access to the types of transactions and functions that authorized users are permitted to execute.',
+        nistRef: 'NIST SP 800-171 Rev 2 § 3.1.2',
+        farRef: 'FAR 52.204-21 (b)(1)(ii)',
+        objective: 'Apply the principle of least privilege — users should only be able to perform the functions their role requires. Restricting transaction types prevents unauthorized actions even by authenticated users.',
+        keyActivities: [
+          'Define roles and associated permissions for each user type',
+          'Implement role-based access control (RBAC)',
+          'Restrict admin privileges to only those who require them',
+          'Prevent standard users from installing software or changing system settings',
+          'Audit permissions quarterly to remove excess access'
+        ],
+        assessmentMethods: 'Review role definitions and permission assignments; test that users cannot perform unauthorized functions; examine privilege escalation controls.',
+        nistMapping: 'AC-2, AC-3, AC-6'
+      },
+      {
+        id: 'AC.L1-3.1.20',
+        text: 'Verify and control/limit connections to external information systems.',
+        nistRef: 'NIST SP 800-171 Rev 2 § 3.1.20',
+        farRef: 'FAR 52.204-21 (b)(1)(iii)',
+        objective: 'Manage and restrict connections between your systems and external networks or systems, including cloud services, partner systems, and the internet. Uncontrolled external connections are a primary attack vector.',
+        keyActivities: [
+          'Maintain an inventory of all external system connections',
+          'Implement and configure firewalls at network boundaries',
+          'Use VPN for remote access connections',
+          'Prohibit use of unauthorized external storage (e.g., personal cloud)',
+          'Establish terms of use for external system connections'
+        ],
+        assessmentMethods: 'Review firewall rules and network diagrams; examine VPN configurations; test external connection controls; review ISAs/MOUs for external systems.',
+        nistMapping: 'AC-17, AC-20, CA-3'
+      },
+      {
+        id: 'AC.L1-3.1.22',
+        text: 'Control information posted or processed on publicly accessible information systems.',
+        nistRef: 'NIST SP 800-171 Rev 2 § 3.1.22',
+        farRef: 'FAR 52.204-21 (b)(1)(iv)',
+        objective: 'Ensure that Federal Contract Information (FCI) is never posted on publicly accessible systems (e.g., public websites, social media, public cloud storage). Designate individuals responsible for reviewing public content.',
+        keyActivities: [
+          'Designate individuals authorized to post information publicly',
+          'Establish a review process before any information is publicly posted',
+          'Train employees on what constitutes FCI and CUI',
+          'Regularly audit public-facing systems for inadvertent FCI disclosure',
+          'Remove any FCI discovered on public systems immediately'
+        ],
+        assessmentMethods: 'Review policies for public posting; examine approval workflows; test public websites for FCI content; interview personnel responsible for public content.',
+        nistMapping: 'AC-22'
+      }
+    ]
+  },
+  {
+    code: 'IA',
+    name: 'Identification & Authentication',
+    practices: [
+      {
+        id: 'IA.L1-3.5.1',
+        text: 'Identify information system users, processes acting on behalf of users, and devices.',
+        nistRef: 'NIST SP 800-171 Rev 2 § 3.5.1',
+        farRef: 'FAR 52.204-21 (b)(1)(v)',
+        objective: 'Every user, process, and device must have a unique identity before accessing your systems. Shared accounts make accountability impossible. Each entity must be uniquely identifiable.',
+        keyActivities: [
+          'Assign unique usernames/IDs to every user — no shared accounts',
+          'Assign unique identifiers to service accounts and automated processes',
+          'Maintain an inventory of all devices connected to the network',
+          'Ensure device identifiers (hostnames, MAC/IP) are tracked',
+          'Disable inactive accounts promptly when users leave'
+        ],
+        assessmentMethods: 'Review account management policies; examine user account lists for uniqueness; verify service accounts are individually identified; review device inventory.',
+        nistMapping: 'IA-2, IA-3, IA-4'
+      },
+      {
+        id: 'IA.L1-3.5.2',
+        text: 'Authenticate (or verify) the identities of those users, processes, or devices, as a prerequisite to allowing access to organizational information systems.',
+        nistRef: 'NIST SP 800-171 Rev 2 § 3.5.2',
+        farRef: 'FAR 52.204-21 (b)(1)(vi)',
+        objective: 'Identification alone is insufficient — the identity must be verified (authenticated) before granting access. Passwords, PINs, certificates, or MFA all serve as authentication mechanisms.',
+        keyActivities: [
+          'Require passwords or other authenticators for all user accounts',
+          'Enforce minimum password complexity and length requirements',
+          'Implement multi-factor authentication (MFA) where possible',
+          'Require device certificates or pre-shared keys for device authentication',
+          'Ensure no system allows unauthenticated access to FCI'
+        ],
+        assessmentMethods: 'Test login processes across all systems; review password policy configurations; verify MFA implementation; examine service account authentication methods.',
+        nistMapping: 'IA-2, IA-3, IA-5'
+      }
+    ]
+  },
+  {
+    code: 'MP',
+    name: 'Media Protection',
+    practices: [
+      {
+        id: 'MP.L1-3.8.3',
+        text: 'Sanitize or destroy information system media containing Federal Contract Information (FCI) before disposal or reuse.',
+        nistRef: 'NIST SP 800-171 Rev 2 § 3.8.3',
+        farRef: 'FAR 52.204-21 (b)(1)(vii)',
+        objective: 'Before any storage media (hard drives, USB drives, CDs, paper) is discarded or reused by a different user, all FCI must be securely removed or the media destroyed to prevent data leakage.',
+        keyActivities: [
+          'Establish a media sanitization and disposal policy',
+          'Use DoD-approved wiping tools (e.g., DBAN) or physical destruction for hard drives',
+          'Use cross-cut shredders for paper documents containing FCI',
+          'Maintain records/logs of media sanitization and disposal',
+          'Ensure third-party disposal vendors provide certificates of destruction'
+        ],
+        assessmentMethods: 'Review media sanitization policy and procedures; examine disposal logs and certificates of destruction; inspect sanitization tools in use; interview personnel on disposal procedures.',
+        nistMapping: 'MP-6'
+      }
+    ]
+  },
+  {
+    code: 'PE',
+    name: 'Physical Protection',
+    practices: [
+      {
+        id: 'PE.L1-3.10.1',
+        text: 'Limit physical access to organizational information systems, equipment, and the respective operating environments to authorized individuals.',
+        nistRef: 'NIST SP 800-171 Rev 2 § 3.10.1',
+        farRef: 'FAR 52.204-21 (b)(1)(viii)',
+        objective: 'Physical access to servers, workstations, network equipment, and facilities where FCI is processed must be restricted to authorized personnel only. Physical security is a prerequisite to logical security.',
+        keyActivities: [
+          'Implement locked doors, badge readers, or key card access for server rooms',
+          'Maintain a list of individuals authorized for physical access',
+          'Use security cameras at entry points to sensitive areas',
+          'Lock workstations when unattended (screen locks)',
+          'Ensure visitors cannot access sensitive equipment areas unescorted'
+        ],
+        assessmentMethods: 'Inspect physical access controls at facility; review access control lists; test badge/key systems; examine security camera coverage; review facility security plans.',
+        nistMapping: 'PE-2, PE-3, PE-6'
+      },
+      {
+        id: 'PE.L1-3.10.3',
+        text: 'Escort visitors and monitor visitor activity.',
+        nistRef: 'NIST SP 800-171 Rev 2 § 3.10.3',
+        farRef: 'FAR 52.204-21 (b)(1)(ix)',
+        objective: 'Visitors (anyone not permanently authorized) entering areas with FCI systems must be escorted by an authorized employee at all times and their activities monitored to prevent unauthorized access or data exposure.',
+        keyActivities: [
+          'Implement a visitor sign-in/sign-out log',
+          'Issue visitor badges distinct from employee badges',
+          'Assign escorts for all visitors in sensitive areas',
+          'Brief escorts on their monitoring responsibilities',
+          'Ensure visitor badges are returned upon departure'
+        ],
+        assessmentMethods: 'Review visitor management policy; inspect visitor logs; interview staff on escort procedures; observe visitor check-in process; verify visitor badge issuance and retrieval.',
+        nistMapping: 'PE-2, PE-8'
+      },
+      {
+        id: 'PE.L1-3.10.4',
+        text: 'Maintain audit logs of physical access.',
+        nistRef: 'NIST SP 800-171 Rev 2 § 3.10.4',
+        farRef: 'FAR 52.204-21 (b)(1)(x)',
+        objective: 'Keep records of who physically accessed controlled areas and when. Physical access logs provide accountability, support incident investigation, and demonstrate compliance during assessments.',
+        keyActivities: [
+          'Configure badge/key card systems to log all access events with timestamps',
+          'Maintain paper sign-in logs where electronic systems are not available',
+          'Retain physical access logs per your record retention policy (minimum 90 days recommended)',
+          'Review access logs periodically for anomalies',
+          'Protect logs from modification or deletion'
+        ],
+        assessmentMethods: 'Examine physical access log records; verify log retention; review electronic badge system configurations; test that access events are recorded; inspect log protection controls.',
+        nistMapping: 'PE-2, PE-8, AU-2'
+      },
+      {
+        id: 'PE.L1-3.10.5',
+        text: 'Control and manage physical access devices.',
+        nistRef: 'NIST SP 800-171 Rev 2 § 3.10.5',
+        farRef: 'FAR 52.204-21 (b)(1)(xi)',
+        objective: 'Manage the lifecycle of physical access devices — keys, key cards, badges, and combinations. Lost or unaccounted-for access devices create security vulnerabilities that must be controlled.',
+        keyActivities: [
+          'Maintain an inventory of all physical access devices issued',
+          'Implement procedures for lost/stolen access device reporting and revocation',
+          'Revoke access devices immediately when employees are terminated',
+          'Change combinations/rekey locks when access devices are lost',
+          'Audit physical access device inventory periodically'
+        ],
+        assessmentMethods: 'Review physical access device inventory; examine issuance and return procedures; test revocation processes; verify terminated employee access is revoked; inspect lock/combination change procedures.',
+        nistMapping: 'PE-3'
+      }
+    ]
+  },
+  {
+    code: 'SC',
+    name: 'System & Communications Protection',
+    practices: [
+      {
+        id: 'SC.L1-3.13.1',
+        text: 'Monitor, control, and protect organizational communications at the external boundaries and key internal boundaries of information systems.',
+        nistRef: 'NIST SP 800-171 Rev 2 § 3.13.1',
+        farRef: 'FAR 52.204-21 (b)(1)(xii)',
+        objective: 'Implement boundary protection to monitor and control the flow of communications entering and exiting your network. This includes firewalls, intrusion detection, and monitoring at network perimeters.',
+        keyActivities: [
+          'Deploy and configure firewalls at the network perimeter',
+          'Implement network monitoring to detect anomalous traffic',
+          'Block unauthorized ports, protocols, and services',
+          'Encrypt communications containing FCI in transit',
+          'Review and update firewall rules regularly'
+        ],
+        assessmentMethods: 'Review network architecture diagrams; inspect firewall configurations and rule sets; examine monitoring tools; test boundary controls; verify encryption of FCI in transit.',
+        nistMapping: 'SC-7, SC-8'
+      },
+      {
+        id: 'SC.L1-3.13.5',
+        text: 'Implement subnetworks for publicly accessible system components that are physically or logically separated from internal networks.',
+        nistRef: 'NIST SP 800-171 Rev 2 § 3.13.5',
+        farRef: 'FAR 52.204-21 (b)(1)(xiii)',
+        objective: 'Publicly accessible systems (web servers, email gateways, DNS) should be placed in a DMZ — a separate network segment isolated from internal systems where FCI resides. This limits the blast radius of a breach.',
+        keyActivities: [
+          'Implement a DMZ for all publicly accessible servers',
+          'Use separate VLANs or physical segments for public vs. internal systems',
+          'Ensure FCI is never stored on or accessible from DMZ systems',
+          'Configure firewall rules to prevent direct DMZ-to-internal traffic',
+          'Document network segmentation in architecture diagrams'
+        ],
+        assessmentMethods: 'Review network architecture and segmentation; inspect VLAN/DMZ configurations; test that DMZ systems cannot access internal FCI systems; examine firewall rules between network segments.',
+        nistMapping: 'SC-7'
+      }
+    ]
+  },
+  {
+    code: 'SI',
+    name: 'System & Information Integrity',
+    practices: [
+      {
+        id: 'SI.L1-3.14.1',
+        text: 'Identify, report, and correct information and information system flaws in a timely manner.',
+        nistRef: 'NIST SP 800-171 Rev 2 § 3.14.1',
+        farRef: 'FAR 52.204-21 (b)(1)(xiv)',
+        objective: 'Establish a patch management program to discover, track, and remediate security vulnerabilities in software, firmware, and operating systems before attackers can exploit them.',
+        keyActivities: [
+          'Subscribe to vendor security advisories and CVE feeds',
+          'Implement automated patch management tools (e.g., WSUS, SCCM)',
+          'Define SLAs for patching: critical (72hr), high (30 days), medium (90 days)',
+          'Test patches in a non-production environment before deployment',
+          'Maintain records of patch status for all systems'
+        ],
+        assessmentMethods: 'Review patch management policy and procedures; examine vulnerability scan results; verify patch deployment timelines; inspect patch management tool configurations; review patch status reports.',
+        nistMapping: 'SI-2'
+      },
+      {
+        id: 'SI.L1-3.14.2',
+        text: 'Provide protection from malicious code at appropriate locations within organizational information systems.',
+        nistRef: 'NIST SP 800-171 Rev 2 § 3.14.2',
+        farRef: 'FAR 52.204-21 (b)(1)(xv)',
+        objective: 'Deploy anti-malware protections at endpoints, email gateways, and other appropriate locations. Malicious code (viruses, ransomware, trojans) is one of the top threats to organizations handling FCI.',
+        keyActivities: [
+          'Deploy endpoint protection (EDR/AV) on all workstations and servers',
+          'Enable real-time scanning on all endpoints',
+          'Implement email filtering to block malicious attachments',
+          'Deploy web filtering to block access to malicious sites',
+          'Configure automatic quarantine/remediation of detected threats'
+        ],
+        assessmentMethods: 'Review anti-malware deployment scope; examine endpoint protection configurations; verify real-time scanning is enabled; test email and web filtering; review threat detection and response logs.',
+        nistMapping: 'SI-3'
+      },
+      {
+        id: 'SI.L1-3.14.4',
+        text: 'Update malicious code protection mechanisms when new releases are available.',
+        nistRef: 'NIST SP 800-171 Rev 2 § 3.14.4',
+        farRef: 'FAR 52.204-21 (b)(1)(xvi)',
+        objective: 'Anti-malware tools are only effective if their signature databases and engines are current. Enable automatic updates so protection mechanisms stay current against the latest threats.',
+        keyActivities: [
+          'Enable automatic definition/signature updates on all AV/EDR tools',
+          'Configure update frequency (daily or more frequent for signatures)',
+          'Monitor for systems with outdated definitions',
+          'Verify updates are reaching all endpoints including offline/remote systems',
+          'Test that updates deploy successfully and alert on failures'
+        ],
+        assessmentMethods: 'Examine anti-malware update configurations; verify definition age on sampled endpoints; review update management reports; test that alerts fire when definitions become outdated.',
+        nistMapping: 'SI-3'
+      },
+      {
+        id: 'SI.L1-3.14.5',
+        text: 'Perform periodic scans of the information system and real-time scans of files from external sources as files are downloaded, opened, or executed.',
+        nistRef: 'NIST SP 800-171 Rev 2 § 3.14.5',
+        farRef: 'FAR 52.204-21 (b)(1)(xvii)',
+        objective: 'Conduct regular full-system scans to detect malware that may have evaded real-time protection, and scan all files from external sources (email attachments, USB drives, downloads) at point of introduction.',
+        keyActivities: [
+          'Schedule periodic full-system scans (at minimum weekly)',
+          'Enable on-access/real-time scanning for all file operations',
+          'Scan all files from external media before allowing execution',
+          'Configure scans to include compressed/archived files',
+          'Review scan logs and investigate any detected threats'
+        ],
+        assessmentMethods: 'Review scheduled scan configurations; examine scan logs and history; test real-time scanning by simulating file download; verify USB/external media scanning is enforced; review scan coverage.',
+        nistMapping: 'SI-3'
+      }
+    ]
+  }
+];
+
+// State
+let responses = {};   // { practiceId: { answer: 'yes'|'no'|'na', evidence: '' } }
+let currentFilter = 'all';
+
+function saveAssessorInfo() {
+  const info = {
+    name:    document.getElementById('assessor-name').value,
+    title:   document.getElementById('assessor-title').value,
+    org:     document.getElementById('assessor-org').value,
+    date:    document.getElementById('assessor-date').value,
+    review:  document.getElementById('assessor-review').value,
+    version: document.getElementById('assessor-version').value,
+  };
+  localStorage.setItem('cmmc_l1_assessor', JSON.stringify(info));
+}
+
+function loadAssessorInfo() {
+  const saved = localStorage.getItem('cmmc_l1_assessor');
+  if (!saved) return;
+  try {
+    const info = JSON.parse(saved);
+    document.getElementById('assessor-name').value    = info.name    || '';
+    document.getElementById('assessor-title').value   = info.title   || '';
+    document.getElementById('assessor-org').value     = info.org     || '';
+    document.getElementById('assessor-date').value    = info.date    || '';
+    document.getElementById('assessor-review').value  = info.review  || '';
+    document.getElementById('assessor-version').value = info.version || '';
+  } catch(e) {}
+}
+
+function getAssessorInfo() {
+  return {
+    name:    document.getElementById('assessor-name').value    || 'N/A',
+    title:   document.getElementById('assessor-title').value   || 'N/A',
+    org:     document.getElementById('assessor-org').value     || 'N/A',
+    date:    document.getElementById('assessor-date').value    || 'N/A',
+    review:  document.getElementById('assessor-review').value  || 'N/A',
+    version: document.getElementById('assessor-version').value || 'N/A',
+  };
+}
+
+function loadState() {
+  const saved = localStorage.getItem('cmmc_l1_state');
+  if (saved) { try { responses = JSON.parse(saved); } catch(e) {} }
+}
+
+function saveState() {
+  localStorage.setItem('cmmc_l1_state', JSON.stringify(responses));
+}
+
+function buildUI() {
+  const container = document.getElementById('assessment');
+  container.innerHTML = '';
+  DOMAINS.forEach((domain, di) => {
+    const sec = document.createElement('div');
+    sec.className = 'domain-section open';
+    sec.id = `domain-${domain.code}`;
+
+    sec.innerHTML = `
+      <div class="domain-header" onclick="toggleDomain('${domain.code}')">
+        <div class="domain-code">${domain.code}</div>
+        <div class="domain-name">${domain.name}</div>
+        <div class="domain-progress">
+          <div class="domain-pill" id="pill-${domain.code}"></div>
+        </div>
+        <div class="domain-chevron">▶</div>
+      </div>
+      <div class="domain-body" id="body-${domain.code}">
+        ${domain.practices.map(p => buildPractice(p)).join('')}
+      </div>
+    `;
+    container.appendChild(sec);
+  });
+  updateAllUI();
+}
+
+function buildPractice(p) {
+  const safeId = p.id.replace(/\./g,'-');
+  const activities = p.keyActivities ? p.keyActivities.map(a => `<li style="margin-bottom:4px">${a}</li>`).join('') : '';
+  return `
+    <div class="practice" id="practice-${safeId}">
+      <div class="practice-header">
+        <div class="practice-status-dot"></div>
+        <div class="practice-id">${p.id}</div>
+        <div class="practice-text">${p.text}</div>
+      </div>
+
+      <button class="guidance-toggle" id="gt-${safeId}" onclick="toggleGuidance('${safeId}')">
+        <span class="gt-arrow">▶</span>&nbsp;GUIDANCE
+      </button>
+
+      <div class="guidance-panel" id="gp-${safeId}">
+        <div class="guidance-inner">
+          <div class="guidance-body">
+            <div class="guidance-row">
+              <div class="guidance-label">Objective</div>
+              <div class="guidance-val">${p.objective || '—'}</div>
+            </div>
+            <hr class="guidance-divider">
+            <div class="guidance-row">
+              <div class="guidance-label">Key Activities</div>
+              <div class="guidance-val"><ul style="padding-left:16px; margin:0">${activities}</ul></div>
+            </div>
+            <hr class="guidance-divider">
+            <div class="guidance-row">
+              <div class="guidance-label">Assessment</div>
+              <div class="guidance-val">${p.assessmentMethods || '—'}</div>
+            </div>
+            <hr class="guidance-divider">
+            <div class="guidance-row">
+              <div class="guidance-label">References</div>
+              <div class="guidance-val">
+                <div class="guidance-tags">
+                  <span class="guidance-tag">${p.nistRef || ''}</span>
+                  <span class="guidance-tag">${p.farRef || ''}</span>
+                  ${p.nistMapping ? p.nistMapping.split(', ').map(m => `<span class="guidance-tag">800-53: ${m}</span>`).join('') : ''}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="practice-controls" style="margin-top:12px">
+        <div class="response-btns">
+          <button class="resp-btn yes" onclick="setAnswer('${p.id}','yes')">✓ Yes</button>
+          <button class="resp-btn no" onclick="setAnswer('${p.id}','no')">✕ No</button>
+          <button class="resp-btn na" onclick="setAnswer('${p.id}','na')">— N/A</button>
+        </div>
+      </div>
+
+      <div class="evidence-section">
+        <button class="evidence-toggle" id="et-${safeId}" onclick="toggleEvidence('${safeId}')">
+          <span class="ev-arrow">▶</span>
+          <span class="ev-label">📋 Evidence / Notes</span>
+          <span class="ev-count" id="ec-${safeId}" style="display:none"></span>
+        </button>
+        <div class="evidence-panel" id="ep-${safeId}">
+          <div class="evidence-panel-inner">
+            <div class="evidence-body">
+              <textarea class="evidence-input" id="ei-${safeId}"
+                placeholder="Write your evidence notes here... Describe controls in place, policies, screenshots, system configurations, or any other supporting information."
+                oninput="setEvidence('${p.id}', this.value)"
+                spellcheck="true"
+                lang="en"
+              >${(responses[p.id]?.evidence || '')}</textarea>
+              <div class="evidence-file-row">
+                <button class="evidence-file-btn" onclick="document.getElementById('ef-${safeId}').click()">📎 Attach Files</button>
+                <button class="evidence-file-btn" onclick="document.getElementById('ei2-${safeId}').click()">🖼 Attach Images</button>
+                <input class="evidence-file-input" id="ef-${safeId}" type="file" multiple accept=".pdf,.doc,.docx,.txt,.xlsx,.csv" onchange="addAttachments('${p.id}','${safeId}',this.files)">
+                <input class="evidence-file-input" id="ei2-${safeId}" type="file" multiple accept="image/*" onchange="addAttachments('${p.id}','${safeId}',this.files)">
+              </div>
+              <div class="evidence-attachments" id="ea-${safeId}"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function toggleGuidance(safeId) {
+  const panel = document.getElementById(`gp-${safeId}`);
+  const btn   = document.getElementById(`gt-${safeId}`);
+  const isOpen = panel.classList.contains('open');
+  panel.classList.toggle('open', !isOpen);
+  btn.classList.toggle('open', !isOpen);
+}
+
+function toggleEvidence(safeId) {
+  const panel = document.getElementById(`ep-${safeId}`);
+  const btn   = document.getElementById(`et-${safeId}`);
+  const isOpen = panel.classList.contains('open');
+  panel.classList.toggle('open', !isOpen);
+  btn.classList.toggle('open', !isOpen);
+}
+
+// Attachments stored in memory (not localStorage due to size)
+const attachments = {}; // { practiceId: [{name, type, dataUrl}] }
+
+function addAttachments(id, safeId, files) {
+  if (!attachments[id]) attachments[id] = [];
+  Array.from(files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      attachments[id].push({ name: file.name, type: file.type, dataUrl: e.target.result });
+      renderAttachments(id, safeId);
+      updateEvidenceCount(id, safeId);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function removeAttachment(id, safeId, idx) {
+  if (attachments[id]) {
+    attachments[id].splice(idx, 1);
+    renderAttachments(id, safeId);
+    updateEvidenceCount(id, safeId);
+  }
+}
+
+function renderAttachments(id, safeId) {
+  const container = document.getElementById(`ea-${safeId}`);
+  if (!container) return;
+  const list = attachments[id] || [];
+  container.innerHTML = list.map((a, i) => {
+    const isImage = a.type.startsWith('image/');
+    const thumb = isImage
+      ? `<img class="attachment-thumb" src="${a.dataUrl}" alt="${a.name}">`
+      : `<div class="attachment-icon">${getFileIcon(a.name)}</div>`;
+    return `
+      <div class="attachment-item" onclick="openLightbox('${id}',${i})" title="Click to preview">
+        ${thumb}
+        <span class="attachment-name" title="${a.name}">${a.name}</span>
+        <button class="attachment-remove" onclick="event.stopPropagation(); removeAttachment('${id}','${safeId}',${i})" title="Remove">✕</button>
+      </div>
+    `;
+  }).join('');
+}
+
+// Lightbox
+let currentLightboxAttachment = null;
+
+function openLightbox(id, idx) {
+  const a = (attachments[id] || [])[idx];
+  if (!a) return;
+  currentLightboxAttachment = a;
+
+  document.getElementById('lb-filename').textContent = a.name;
+
+  const content = document.getElementById('lb-content');
+  content.innerHTML = '';
+
+  if (a.type.startsWith('image/')) {
+    const img = document.createElement('img');
+    img.src = a.dataUrl;
+    img.alt = a.name;
+    content.appendChild(img);
+
+  } else if (a.type === 'application/pdf') {
+    const iframe = document.createElement('iframe');
+    iframe.src = a.dataUrl;
+    iframe.title = a.name;
+    content.appendChild(iframe);
+
+  } else if (a.type === 'text/plain' || a.name.endsWith('.txt') || a.name.endsWith('.csv')) {
+    // Decode base64 text
+    const base64 = a.dataUrl.split(',')[1];
+    const decoded = atob(base64);
+    const pre = document.createElement('div');
+    pre.className = 'lightbox-text';
+    pre.textContent = decoded;
+    content.appendChild(pre);
+
+  } else {
+    // Unsupported — show download prompt
+    const div = document.createElement('div');
+    div.className = 'lightbox-unsupported';
+    div.innerHTML = `
+      <div class="lb-icon">${getFileIcon(a.name)}</div>
+      <div style="color:var(--text); font-size:1rem">${a.name}</div>
+      <p>This file type cannot be previewed in the browser.</p>
+      <p>Use the Download button above to open it.</p>
+    `;
+    content.appendChild(div);
+  }
+
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox(e) {
+  if (e.target === document.getElementById('lightbox')) closeLightboxDirect();
+}
+
+function closeLightboxDirect() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+  currentLightboxAttachment = null;
+}
+
+function downloadAttachment() {
+  if (!currentLightboxAttachment) return;
+  const a = document.createElement('a');
+  a.href = currentLightboxAttachment.dataUrl;
+  a.download = currentLightboxAttachment.name;
+  a.click();
+}
+
+function updateEvidenceCount(id, safeId) {
+  const countEl = document.getElementById(`ec-${safeId}`);
+  if (!countEl) return;
+  const fileCount = (attachments[id] || []).length;
+  if (fileCount > 0) {
+    countEl.textContent = `${fileCount} file${fileCount > 1 ? 's' : ''}`;
+    countEl.style.display = '';
+  } else {
+    countEl.style.display = 'none';
+  }
+}
+
+function getFileIcon(name) {
+  const ext = name.split('.').pop().toLowerCase();
+  if (['pdf'].includes(ext)) return '📄';
+  if (['doc','docx'].includes(ext)) return '📝';
+  if (['xls','xlsx','csv'].includes(ext)) return '📊';
+  if (['txt'].includes(ext)) return '📃';
+  return '📎';
+}
+
+function setAnswer(id, answer) {
+  if (!responses[id]) responses[id] = { answer: '', evidence: '' };
+  // Toggle off if clicking the same answer again
+  responses[id].answer = responses[id].answer === answer ? '' : answer;
+  saveState();
+  updatePracticeUI(id);
+  updateAllUI();
+  applyFilter(currentFilter);
+}
+
+function setEvidence(id, val) {
+  if (!responses[id]) responses[id] = { answer: '', evidence: '' };
+  responses[id].evidence = val;
+  saveState();
+}
+
+function updatePracticeUI(id) {
+  const safe = id.replace(/\./g,'-');
+  const el = document.getElementById(`practice-${safe}`);
+  if (!el) return;
+  const r = responses[id];
+  el.className = 'practice' + (r?.answer ? ` answered-${r.answer}` : '');
+
+  // update buttons
+  el.querySelectorAll('.resp-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (r?.answer && btn.classList.contains(r.answer)) btn.classList.add('active');
+  });
+}
+
+function updateAllUI() {
+  // Tally
+  let yes=0, no=0, na=0, total=0;
+  DOMAINS.forEach(d => {
+    d.practices.forEach(p => {
+      total++;
+      const a = responses[p.id]?.answer;
+      if (a === 'yes') yes++;
+      else if (a === 'no') no++;
+      else if (a === 'na') na++;
+      updatePracticeUI(p.id);
+    });
+    updateDomainPill(d);
+  });
+
+  // Score (NA excluded from denominator)
+  const denom = total - na;
+  const pct = denom > 0 ? Math.round((yes / denom) * 100) : 0;
+
+  document.getElementById('stat-yes').textContent = yes;
+  document.getElementById('stat-no').textContent = no;
+  document.getElementById('stat-na').textContent = na;
+
+  const pctEl = document.getElementById('score-pct');
+  pctEl.textContent = pct + '%';
+
+  // Ring
+  const circumference = 490;
+  const offset = circumference - (pct / 100) * circumference;
+  const ring = document.getElementById('ring-fill');
+  ring.style.strokeDashoffset = offset;
+
+  // Ring color
+  let color = '#ff3d57';
+  if (pct >= 80) color = '#0066ff';
+  if (pct === 100) color = '#00e676';
+  ring.style.stroke = color;
+  pctEl.style.color = color;
+
+  // Status
+  const statusEl = document.getElementById('score-status');
+  const answered = yes + no + na;
+  if (answered === 0) {
+    statusEl.textContent = 'NOT STARTED';
+    statusEl.style.background = 'rgba(255,255,255,0.05)';
+    statusEl.style.color = 'var(--text-dimmer)';
+  } else if (pct === 100) {
+    statusEl.textContent = '✓ FULLY COMPLIANT';
+    statusEl.style.background = 'rgba(0,230,118,0.1)';
+    statusEl.style.color = 'var(--green)';
+  } else if (no > 0) {
+    statusEl.textContent = `⚠ ${no} GAP${no>1?'S':''}`;
+    statusEl.style.background = 'rgba(255,61,87,0.1)';
+    statusEl.style.color = 'var(--red)';
+  } else {
+    statusEl.textContent = `${answered}/${total} ANSWERED`;
+    statusEl.style.background = 'rgba(0,102,255,0.1)';
+    statusEl.style.color = 'var(--accent2)';
+  }
+
+  updateDomainBars();
+}
+
+function updateDomainPill(domain) {
+  const pill = document.getElementById(`pill-${domain.code}`);
+  if (!pill) return;
+  let yes=0, no=0, na=0, total=domain.practices.length;
+  domain.practices.forEach(p => {
+    const a = responses[p.id]?.answer;
+    if (a==='yes') yes++;
+    else if (a==='no') no++;
+    else if (a==='na') na++;
+  });
+  const answered = yes+no+na;
+  const denom = total-na;
+  const pct = denom>0 ? Math.round((yes/denom)*100) : 0;
+  if (answered===0) {
+    pill.style.color = 'var(--text-dimmer)';
+    pill.textContent = `0/${total}`;
+  } else {
+    pill.style.color = no>0 ? 'var(--red)' : 'var(--green)';
+    pill.textContent = `${answered}/${total} · ${pct}%`;
+  }
+}
+
+function updateDomainBars() {
+  const container = document.getElementById('domain-bars');
+  container.innerHTML = '';
+  DOMAINS.forEach(d => {
+    let yes=0, na=0, total=d.practices.length;
+    d.practices.forEach(p => {
+      const a = responses[p.id]?.answer;
+      if (a==='yes') yes++;
+      if (a==='na') na++;
+    });
+    const denom = total-na;
+    const pct = denom>0 ? Math.round((yes/denom)*100) : 0;
+    container.innerHTML += `
+      <div class="domain-bar-row">
+        <div class="domain-bar-label">${d.code} · ${d.name}</div>
+        <div class="domain-bar-track">
+          <div class="domain-bar-fill" style="width:${pct}%; background: ${pct===100?'var(--green)':'var(--accent)'}"></div>
+        </div>
+        <div class="domain-bar-pct">${pct}%</div>
+      </div>
+    `;
+  });
+}
+
+function toggleDomain(code) {
+  const sec = document.getElementById(`domain-${code}`);
+  sec.classList.toggle('open');
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFilter(filter);
+}
+
+function applyFilter(filter) {
+  DOMAINS.forEach(d => {
+    d.practices.forEach(p => {
+      const safe = p.id.replace(/\./g,'-');
+      const el = document.getElementById(`practice-${safe}`);
+      if (!el) return;
+      const a = responses[p.id]?.answer;
+      let show = true;
+      if (filter === 'unanswered') show = !a;
+      if (filter === 'no') show = a === 'no';
+      el.style.display = show ? '' : 'none';
+    });
+  });
+}
+
+function openReport() {
+  const report = generateReport();
+  document.getElementById('report-output').textContent = report;
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeReport() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+function generateReport() {
+  const now = new Date();
+  const ai = getAssessorInfo();
+  let yes=0, no=0, na=0, total=0;
+  DOMAINS.forEach(d => d.practices.forEach(p => {
+    total++;
+    const a = responses[p.id]?.answer;
+    if (a==='yes') yes++; else if (a==='no') no++; else if (a==='na') na++;
+  }));
+  const pct = (total-na)>0 ? Math.round((yes/(total-na))*100) : 0;
+
+  let lines = [];
+  lines.push('══════════════════════════════════════════════════════════');
+  lines.push('  CMMC LEVEL 1 SELF-ASSESSMENT REPORT');
+  lines.push('══════════════════════════════════════════════════════════');
+  lines.push(`  Generated     : ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`);
+  lines.push('');
+  lines.push('  ASSESSOR INFORMATION');
+  lines.push(`  Name          : ${ai.name}`);
+  lines.push(`  Title / Role  : ${ai.title}`);
+  lines.push(`  Organization  : ${ai.org}`);
+  lines.push(`  Assessment Date: ${ai.date}`);
+  lines.push(`  Next Review   : ${ai.review}`);
+  lines.push(`  Version       : ${ai.version}`);
+  lines.push('');
+  lines.push('  RESULTS SUMMARY');
+  lines.push(`  Compliant     : ${yes} / ${total-na} practices (${pct}%)`);
+  lines.push(`  Non-Compliant : ${no}`);
+  lines.push(`  Not Applicable: ${na}`);
+  lines.push('══════════════════════════════════════════════════════════');
+  lines.push('');
+
+  DOMAINS.forEach(d => {
+    let dyes=0, dno=0, dna=0;
+    d.practices.forEach(p => {
+      const a = responses[p.id]?.answer;
+      if (a==='yes') dyes++; else if (a==='no') dno++; else if (a==='na') dna++;
+    });
+    lines.push(`──────────────────────────────────────────────────────────`);
+    lines.push(`  [${d.code}] ${d.name.toUpperCase()}`);
+    lines.push(`  Compliant: ${dyes}  Non-Compliant: ${dno}  N/A: ${dna}`);
+    lines.push('');
+    d.practices.forEach(p => {
+      const r = responses[p.id];
+      const a = r?.answer || 'UNANSWERED';
+      const icon = a==='yes' ? '[✓]' : a==='no' ? '[✕]' : a==='na' ? '[–]' : '[ ]';
+      lines.push(`  ${icon} ${p.id}`);
+      lines.push(`      ${p.text.substring(0,80)}${p.text.length>80?'...':''}`);
+      if (r?.evidence) lines.push(`      Evidence: ${r.evidence}`);
+      lines.push('');
+    });
+  });
+
+  lines.push('══════════════════════════════════════════════════════════');
+  lines.push('  Generated by CMMC L1 Self-Assessment Tool');
+  lines.push('  DISCLAIMER: This is a self-assessment tool only.');
+  lines.push('  Official C3PAO assessment required for certification.');
+  lines.push('══════════════════════════════════════════════════════════');
+
+  return lines.join('\n');
+}
+
+function copyReport() {
+  navigator.clipboard.writeText(document.getElementById('report-output').textContent)
+    .then(() => showToast('Report copied to clipboard'));
+}
+
+function downloadReport() {
+  const text = document.getElementById('report-output').textContent;
+  const blob = new Blob([text], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `CMMC_L1_Assessment_${new Date().toISOString().split('T')[0]}.txt`;
+  a.click();
+  showToast('Report downloaded');
+}
+
+function saveProgress() {
+  saveState();
+  showToast('Progress saved');
+}
+
+function resetAll() {
+  if (!confirm('Reset all responses? This cannot be undone.')) return;
+  responses = {};
+  saveState();
+  buildUI();
+  showToast('Assessment reset');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Footer year
+document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+// Escape key closes lightbox
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeLightboxDirect();
+});
+
+// Init
+loadState();
+loadAssessorInfo();
+buildUI();
+
+// Close modal on overlay click
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeReport();
+});
+</script>
+</body>
+</html>
